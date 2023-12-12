@@ -1,5 +1,6 @@
-// ignore_for_file: avoid_print, file_names, unused_local_variable, duplicate_ignore, unnecessary_brace_in_string_interps, use_build_context_synchronously
+// ignore_for_file: avoid_print, file_names, unused_local_variable, duplicate_ignore, unnecessary_brace_in_string_interps, use_build_context_synchronously, prefer_const_constructors
 
+import 'package:appioc/db/crud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appioc/page/home.dart';
@@ -27,6 +28,8 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  final bool _isObscured = true;
 
   @override
   Widget build(BuildContext context) {
@@ -104,10 +107,20 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _isObscured,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.key_rounded),
                     labelText: 'Password',
+                    // suffixIcon: IconButton(
+                    //   icon: Icon(_isObscured
+                    //       ? Icons.visibility
+                    //       : Icons.visibility_off),
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       _isObscured = !_isObscured;
+                    //     });
+                    //   },
+                    // ),
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     // Màu sắc của nhãn
                     enabledBorder: OutlineInputBorder(
@@ -141,7 +154,8 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Home(data: user.uid),
+                          builder: (context) => const HomePage(),
+                          // builder: (context) => Home(data: user.uid),
                         ),
                       );
                     }
@@ -169,6 +183,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const Text('You Don`t Have Account?'),
                 ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 0, 225, 255)
+                          .withOpacity(0.9), // Đặt màu nền của nút
+                    ),
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
