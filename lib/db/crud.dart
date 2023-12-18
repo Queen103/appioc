@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String data;
+  const HomePage({Key? key, required this.data}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
