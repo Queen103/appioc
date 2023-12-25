@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                     final double? price =
                         double.tryParse(_priceController.text);
                     if (price != null) {
-                      await _products.add({"product": name, "price": price});
+                      await _products.add({"name": name, "price": price});
 
                       _nameController.text = '';
                       _priceController.text = '';
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _update([DocumentSnapshot? documentSnapshot]) async {
     if (documentSnapshot != null) {
-      _nameController.text = documentSnapshot['product'];
+      _nameController.text = documentSnapshot['name'];
       _priceController.text = documentSnapshot['price'].toString();
     }
 
@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                     if (price != null) {
                       await _products
                           .doc(documentSnapshot!.id)
-                          .update({"product": name, "price": price});
+                          .update({"name": name, "price": price});
                       _nameController.text = '';
                       _priceController.text = '';
                       Navigator.of(context).pop();
@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
-                      title: Text(documentSnapshot['product']),
+                      title: Text(documentSnapshot['name']),
                       subtitle: Text(documentSnapshot['price'].toString()),
                       trailing: SizedBox(
                         width: 100,
