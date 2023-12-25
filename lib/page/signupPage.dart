@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appioc/help/help.dart';
 import 'package:appioc/page/loginPage.dart';
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../db/login.dart';
 
@@ -18,16 +20,11 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPage extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  void showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
+  final TextEditingController _fullnameController = TextEditingController();
+  final TextEditingController _birthController = TextEditingController();
+  final TextEditingController _phonenumberController = TextEditingController();
+  final CollectionReference _user =
+      FirebaseFirestore.instance.collection('users');
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +38,7 @@ class _SignUpPage extends State<SignUpPage> {
           ),
         ),
 
-        padding: const EdgeInsets.symmetric(vertical: 200, horizontal: 40),
+        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 40),
         child: Container(
           decoration: BoxDecoration(
             color: const Color.fromARGB(255, 216, 205, 216).withOpacity(0.8),
@@ -83,15 +80,6 @@ class _SignUpPage extends State<SignUpPage> {
                     labelText: 'Gmail',
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     // Màu sắc của nhãn
-                    enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color.fromARGB(255, 0, 0, 0))),
-
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 0, 0,
-                              0)), // Màu sắc và độ đậm của viền khi có focus
-                    ),
                   ),
                 ),
                 const SizedBox(height: 16.0),
@@ -103,16 +91,48 @@ class _SignUpPage extends State<SignUpPage> {
                     labelText: 'Password',
                     labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     // Màu sắc của nhãn
-                    enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color.fromARGB(255, 0, 0, 0))),
-
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 0, 0,
-                              0)), // Màu sắc và độ đậm của viền khi có focus
-                    ),
                   ),
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _fullnameController,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.person),
+                    labelText: 'Full Name',
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                    // Màu sắc của nhãn
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _phonenumberController,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.phone),
+                    labelText: 'Phone Number',
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                    // Màu sắc của nhãn
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _birthController,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.date_range_outlined),
+                    labelText: "Select your birth",
+                  ),
+                  onTap: () async {
+                    DateTime? pickDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2100));
+                    if (pickDate != null) {
+                      setState(() {
+                        _birthController.text =
+                            DateFormat('dd-MM-yyyy').format(pickDate);
+                      });
+                    }
+                  },
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
@@ -124,19 +144,32 @@ class _SignUpPage extends State<SignUpPage> {
                     // Xử lý đăng nhập ở đây
                     String email = _emailController.text;
                     String password = _passwordController.text;
+                    String fullname = _fullnameController.text;
+                    String phonenumber = _phonenumberController.text;
+                    String birth = _birthController.text;
                     print(email);
                     // Thực hiện xác thực, chuyển đến màn hình chính, v.v.
                     User? user = await login()
                         .signUpWithEmailAndPassword(context, email, password);
                     if (user != null) {
                       print('đã đăng ký với :${user}');
+                      await _user.add({
+                        "gmail": email,
+                        "userid": user.uid,
+                        "fullname": fullname,
+                        "birth": birth,
+                        "phonenumber": phonenumber,
+                        "room": "0000",
+                        "ismanager": false,
+                        "isblock": false
+                      });
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const LoginPage()),
                         (route) => false,
                       );
-                      showSnackbar('Vui lòng đăng nhập lại');
+                      showSnackbar(context, 'Vui lòng đăng nhập lại');
                     }
                   },
                   child: const Text(

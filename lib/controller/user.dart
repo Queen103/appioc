@@ -1,4 +1,5 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, no_leading_underscores_for_local_identifiers, unused_element, library_private_types_in_public_api, use_build_context_synchronously
+// ignore_for_file: prefer_typing_uninitialized_variables, no_leading_underscores_for_local_identifiers, unused_element, library_private_types_in_public_api, use_build_context_synchronously, avoid_print, unused_field
+
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,21 @@ class _HomePageState extends State<HomePage> {
 
   final CollectionReference _products =
       FirebaseFirestore.instance.collection('product');
+  final CollectionReference _users =
+      FirebaseFirestore.instance.collection('users');
+  final CollectionReference _buy = FirebaseFirestore.instance.collection('buy');
+
+  bool checkUser(DocumentSnapshot documentSnapshot, String data) {
+    try {
+      if (documentSnapshot['email'] == data) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print("try again");
+      return false;
+    }
+  }
 
   Future<void> _create([DocumentSnapshot? documentSnapshot]) async {
     await showModalBottomSheet(
@@ -56,8 +72,8 @@ class _HomePageState extends State<HomePage> {
                     final double? price =
                         double.tryParse(_priceController.text);
                     if (price != null) {
-                      await _products.add({"name": name, "price": price});
-
+                      await _products.add({"product": name, "price": price});
+                      
                       _nameController.text = '';
                       _priceController.text = '';
                       Navigator.of(context).pop();
@@ -72,7 +88,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _update([DocumentSnapshot? documentSnapshot]) async {
     if (documentSnapshot != null) {
-      _nameController.text = documentSnapshot['name'];
+      _nameController.text = documentSnapshot['product'];
       _priceController.text = documentSnapshot['price'].toString();
     }
 
@@ -114,7 +130,7 @@ class _HomePageState extends State<HomePage> {
                     if (price != null) {
                       await _products
                           .doc(documentSnapshot!.id)
-                          .update({"name": name, "price": price});
+                          .update({"product": name, "price": price});
                       _nameController.text = '';
                       _priceController.text = '';
                       Navigator.of(context).pop();
@@ -152,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
-                      title: Text(documentSnapshot['name']),
+                      title: Text(documentSnapshot['product']),
                       subtitle: Text(documentSnapshot['price'].toString()),
                       trailing: SizedBox(
                         width: 100,
