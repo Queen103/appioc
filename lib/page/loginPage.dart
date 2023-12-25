@@ -3,7 +3,6 @@
 import 'package:appioc/db/crud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:appioc/page/home.dart';
 import 'package:appioc/page/signupPage.dart';
 
 import '../db/login.dart';
@@ -18,6 +17,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  
 
   void showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
