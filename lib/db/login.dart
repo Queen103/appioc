@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, camel_case_types, unused_element, implementation_imports, avoid_web_libraries_in_flutter, use_build_context_synchronously
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -64,6 +65,23 @@ class login {
     } catch (error) {
       print("Error during Google sign in: $error");
       return null;
+    }
+  }
+
+  Future<List<String>> getDataFromFirestore() async {
+    try {
+      // Thực hiện truy vấn để lấy danh sách giá trị từ một trường cụ thể
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+
+      // Lấy danh sách giá trị từ một trường cụ thể (ví dụ: 'your_field')
+      List<String> dataList =
+          querySnapshot.docs.map((doc) => doc['userid'] as String).toList();
+      print(dataList);
+      return dataList;
+    } catch (e) {
+      print('Error fetching data: $e');
+      return [];
     }
   }
 }

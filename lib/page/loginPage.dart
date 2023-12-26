@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print, file_names, unused_local_variable, duplicate_ignore, unnecessary_brace_in_string_interps, use_build_context_synchronously, prefer_const_constructors
 
 import 'package:appioc/db/crud.dart';
+import 'package:appioc/page/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:appioc/page/signupPage.dart';
-
 import '../db/login.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,29 +21,11 @@ class _LoginPageState extends State<LoginPage> {
   final CollectionReference _user =
       FirebaseFirestore.instance.collection('users');
 
-  void showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   final bool _isObscured = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text(
-      //     'Lookgin Page',
-      //     style: TextStyle(color: Colors.pink),
-      //   ),
-      //   centerTitle: true,
-      //   backgroundColor: Colors.orangeAccent,
-      // ),
       body: Container(
         // color: const Color.fromARGB(214, 255, 214, 64),
         decoration: const BoxDecoration(
@@ -156,8 +138,8 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomePage(data: user.uid),
-                          // builder: (context) => Home(data: user.uid),
+                          builder: (context) => Home(data: user.uid),
+                          // builder: (context) => MyTest(),
                         ),
                       );
                     }
@@ -170,12 +152,26 @@ class _LoginPageState extends State<LoginPage> {
                 GestureDetector(
                   onTap: () async {
                     User? user = await login().loginWithGmailAccount();
+                    List<String> listUser =
+                        await login().getDataFromFirestore();
+                    if (!listUser.contains(user?.uid)) {
+                      await _user.add({
+                        "userid": user?.uid,
+                        "isblock": false,
+                        "ismanager": false,
+                        "gmail": user?.email,
+                        "room": "0000",
+                        "birth": null,
+                        "fullname": user?.displayName,
+                        "phonenumber": user?.phoneNumber
+                      });
+                    }
                     if (user != null) {
-                      print('Đăng nhập mail thành công');
+                      print(user);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomePage(data: user.uid),
+                          builder: (context) => Home(data: user.uid),
                         ),
                       );
                     }
